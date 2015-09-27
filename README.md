@@ -20,4 +20,4 @@ CopyRight 1998
 	忘记了。:(
 
 # Update
-- 生成了 Visual Studio 2015 的配置文件，可以直接打开
+- 生成了 Visual Studio 2015 的配置文件，可以直接打开 (9/27/2015)
