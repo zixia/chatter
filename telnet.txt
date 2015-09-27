@@ -1,0 +1,197 @@
+[上一篇] [本讨论区] [回信到本版] [修改] [删除] [回信给作者] [下一篇] [同作者阅读] [同主题阅读]
+[返回首页] [分类讨论区] [全部讨论区]　  讨论区
+
+--------------------------------------------------------------------------------
+
+发信人: peasant (westgunner), 信区: Winsock 
+标　题: Re: telnet 
+发信站: BBS 水木清华站 (Mon Jul 20 23:02:12 1998) 
+ 
+贴一个简单的 
+#include <stdio.h> 
+#include <netinet/in.h> 
+#include <netdb.h> 
+#include <sys/socket.h> 
+#include <sys/signal.h> 
+#include <sys/time.h> 
+#include <fcntl.h> 
+#include <unistd.h> 
+#include <string.h> 
+#include <curses.h> 
+ 
+#define ZERO   (struct fd_set *)0 
+ 
+int  sockfd; 
+ 
+unsigned char  receiveChar(void)       //从socket读取server发来的一个字节 
+{ char tmp; 
+  if(read(sockfd,& tmp,1)<=0 ) { printf("read socket error.\n"); exit(-1);} 
+  return tmp; 
+} 
+ 
+void sendChar(char ch)           //从socket向server发送一个字节 
+{  
+  if( write(sockfd,& ch,1)<0 ) { printf("write socket error.\n"); exit(-1); } 
+} 
+ 
+void sendString(char p[])       //从socket向server发送一个字符串 
+{ 
+if(write(sockfd,p,strlen(p))<0) { printf("write socket error.\n"); exit(-1); }; 
+} 
+ 
+void killHandler(void)        //信号处理函数 
+{   
+   close(sockfd); 
+   exit(0); 
+} 
+ 
+void closeHandler(void) 
+{ printf("Connection closed by foreign host.\n"); 
+  exit(0); 
+} 
+//============================================================================ 
+main(int argc,char **argv) 
+{  
+        struct sockaddr_in      host; 
+        struct hostent          *hp; 
+        int                     n; 
+        char                    term[]="dumb";     /* 终端类型: 哑终端   */ 
+        int                     status; 
+        struct timeval          timeout; 
+        struct fd_set           mask; 
+        unsigned char           c,cmd,opt; 
+        struct fd_set           rmask; 
+        char                    echo=FALSE; 
+ 
+        signal(SIGTERM,killHandler);                     /* 设回调函数        */ 
+        signal(SIGINT,killHandler); 
+        signal(SIGPIPE,closeHandler); 
+ 
+        hp = gethostbyname("bbs.tsinghua.edu.cn");           /* bbs服务器的名字 */ 
+        if(hp==NULL) { printf("Unkonwn host\n"); exit(-1); } 
+        bzero((char *)& host,sizeof(host)); 
+        bcopy(hp->h_addr,(char *)& host.sin_addr,hp->h_length); 
+        host.sin_family=AF_INET; 
+        host.sin_port=htons(23);                         /*telnet标准端口  */ 
+        if ( (sockfd=socket(AF_INET,SOCK_STREAM,0))<0 )  /* 阻塞式socket */ 
+        { printf(" Error open socket\n"); 
+          exit(-1); 
+        } 
+        status=connect(sockfd,(struct sockaddr *)& host,sizeof(host));/*连接*/ 
+        if(status<0) { printf("Connect error\n"); exit(-1); } 
+ 
+  initscr(); 
+  cbreak(); noecho(); 
+  for(;;) 
+  { 
+        timeout.tv_sec=0; 
+        timeout.tv_usec=10;                    /* 超时限制 */ 
+        FD_ZERO( & rmask); 
+        FD_SET(sockfd,& rmask); 
+        FD_SET(0,     & rmask); 
+        status=select(sockfd+1,& rmask,ZERO,ZERO,& timeout); 
+        if(FD_ISSET(sockfd,& rmask) ) 
+        {  n=read(sockfd,& c,1);           /* 读取一个字节           */ 
+           if( n<=0 ) { printf("socket read error.\n"); exit(-1); } 
+           if (c == 255)                  // IAC字符,后跟telnet命令和协商选项 
+           { 
+                cmd = receiveChar();         //读入命令 
+                opt = receiveChar();         //读入选项 
+                switch(opt) 
+                { 
+                  case 1:            // echo协商选项 
+                     switch(cmd) 
+                     {case 253:    //处理IAC DO ECHO 
+                         echo=TRUE; 
+                         sendChar(255); //发送 IAC WILL ECHO 
+                         sendChar(251); 
+                         sendChar(1); 
+                         break; 
+                      case 254:   //处理IAC DON'T ECHO 
+                          echo=FALSE; 
+                          sendChar(255);  // 发送 IAC WON'T ECHO 
+                          sendChar(252); 
+                          sendChar(1); 
+                          break; 
+                      case 251:    //处理IAC WILL  ECHO 
+                          sendChar(255);  // 发送 IAC DO  ECHO 
+                          sendChar(253); 
+                          sendChar(1); 
+                      } 
+                      break; 
+                  case 3:          // supress go-ahead(抑制向前选项) 
+                     break; 
+                  case 24:        // terminal type(终端类型选项) 
+                     if (cmd == 253) 
+                     { 
+                                // IAC WILL terminal-type 将告诉server终端类型 
+                                sendChar(255); 
+                                sendChar(251); 
+                                sendChar(24); 
+                                 // IAC SB terminal-type IS <term> IAC SE 
+                                sendChar(255); //传送终端类型字符串 
+                                sendChar(250); 
+                                sendChar(24); 
+                                sendChar(0); 
+                                sendString(term); 
+                                sendChar(255); 
+                                sendChar(240); 
+                      } 
+                      else if (cmd == 250) 
+                      {          //SB和SE要配对出现 
+                          while(receiveChar() != 240) 
+                                        ; 
+                       } 
+                       break; 
+ 
+                    default:        // some other command1 
+                       if (cmd == 253) 
+                       { 
+                                // IAC DONT whatever 
+                                sendChar(255); //其它的协商选项均不同意 
+                                sendChar(252); 
+                                sendChar(opt); 
+                        } 
+                 } 
+            } 
+            else                                     //处理字符数据 
+            { putchar(c); 
+              if(echo==TRUE) sendChar( c); 
+            } 
+       } 
+       if( FD_ISSET(0,& rmask) ) 
+       { n=read(0,& c,1); 
+         if(n<0) { printf("read stdin error\n"); exit(-1); } 
+         write(sockfd,& c,1); 
+       } 
+    } 
+} 
+ 
+ 
+ 
+【 在 ladykiller (sweet) 的大作中提到: 】 
+:   
+:  请问各位大侠， 
+:  哪里有TELNET客户端的源代码， 
+:  麻烦告诉一下。！！！ 
+:  谢谢！！ 
+:   
+ 
+ 
+-- 
+年轻 
+需要的是一片开阔的天空 
+和长了翅膀的心 
+虽然在雨里走者 
+却有一片晴空 
+一片晴空 
+ 
+※ 来源:·BBS 水木清华站 bbs.net.tsinghua.edu.cn·[FROM: sun.aiar.xjtu.e] 
+
+--------------------------------------------------------------------------------
+
+
+[上一篇] [本讨论区] [回信到本版] [修改] [删除] [回信给作者] [下一篇] [同作者阅读] [同主题阅读]
+
+
+[返回首页] [分类讨论区] [全部讨论区]　  讨论区
