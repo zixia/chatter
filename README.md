@@ -1,6 +1,4 @@
 # zixia-chatter (紫虾ＢＰCall)
-a visual c++ socket project wrote by zixia in 1998 
-
 Project home page - https://github.com/zixia/chatter
 
 Author: Zixia@SMTH	1998.11
