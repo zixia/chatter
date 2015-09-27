@@ -1,13 +1,13 @@
-[ÉÏÒ»Æª] [±¾ÌÖÂÛÇø] [»ØĞÅµ½±¾°æ] [ĞŞ¸Ä] [É¾³ı] [»ØĞÅ¸ø×÷Õß] [ÏÂÒ»Æª] [Í¬×÷ÕßÔÄ¶Á] [Í¬Ö÷ÌâÔÄ¶Á]
-[·µ»ØÊ×Ò³] [·ÖÀàÌÖÂÛÇø] [È«²¿ÌÖÂÛÇø]¡¡  ÌÖÂÛÇø
+[ä¸Šä¸€ç¯‡] [æœ¬è®¨è®ºåŒº] [å›ä¿¡åˆ°æœ¬ç‰ˆ] [ä¿®æ”¹] [åˆ é™¤] [å›ä¿¡ç»™ä½œè€…] [ä¸‹ä¸€ç¯‡] [åŒä½œè€…é˜…è¯»] [åŒä¸»é¢˜é˜…è¯»]
+[è¿”å›é¦–é¡µ] [åˆ†ç±»è®¨è®ºåŒº] [å…¨éƒ¨è®¨è®ºåŒº]ã€€  è®¨è®ºåŒº
 
 --------------------------------------------------------------------------------
 
-·¢ĞÅÈË: peasant (westgunner), ĞÅÇø: Winsock 
-±ê¡¡Ìâ: Re: telnet 
-·¢ĞÅÕ¾: BBS Ë®Ä¾Çå»ªÕ¾ (Mon Jul 20 23:02:12 1998) 
+å‘ä¿¡äºº: peasant (westgunner), ä¿¡åŒº: Winsock 
+æ ‡ã€€é¢˜: Re: telnet 
+å‘ä¿¡ç«™: BBS æ°´æœ¨æ¸…åç«™ (Mon Jul 20 23:02:12 1998) 
  
-ÌùÒ»¸ö¼òµ¥µÄ 
+è´´ä¸€ä¸ªç®€å•çš„ 
 #include <stdio.h> 
 #include <netinet/in.h> 
 #include <netdb.h> 
@@ -23,23 +23,23 @@
  
 int  sockfd; 
  
-unsigned char  receiveChar(void)       //´Ósocket¶ÁÈ¡server·¢À´µÄÒ»¸ö×Ö½Ú 
+unsigned char  receiveChar(void)       //ä»socketè¯»å–serverå‘æ¥çš„ä¸€ä¸ªå­—èŠ‚ 
 { char tmp; 
   if(read(sockfd,& tmp,1)<=0 ) { printf("read socket error.\n"); exit(-1);} 
   return tmp; 
 } 
  
-void sendChar(char ch)           //´ÓsocketÏòserver·¢ËÍÒ»¸ö×Ö½Ú 
+void sendChar(char ch)           //ä»socketå‘serverå‘é€ä¸€ä¸ªå­—èŠ‚ 
 {  
   if( write(sockfd,& ch,1)<0 ) { printf("write socket error.\n"); exit(-1); } 
 } 
  
-void sendString(char p[])       //´ÓsocketÏòserver·¢ËÍÒ»¸ö×Ö·û´® 
+void sendString(char p[])       //ä»socketå‘serverå‘é€ä¸€ä¸ªå­—ç¬¦ä¸² 
 { 
 if(write(sockfd,p,strlen(p))<0) { printf("write socket error.\n"); exit(-1); }; 
 } 
  
-void killHandler(void)        //ĞÅºÅ´¦Àíº¯Êı 
+void killHandler(void)        //ä¿¡å·å¤„ç†å‡½æ•° 
 {   
    close(sockfd); 
    exit(0); 
@@ -55,7 +55,7 @@ main(int argc,char **argv)
         struct sockaddr_in      host; 
         struct hostent          *hp; 
         int                     n; 
-        char                    term[]="dumb";     /* ÖÕ¶ËÀàĞÍ: ÑÆÖÕ¶Ë   */ 
+        char                    term[]="dumb";     /* ç»ˆç«¯ç±»å‹: å“‘ç»ˆç«¯   */ 
         int                     status; 
         struct timeval          timeout; 
         struct fd_set           mask; 
@@ -63,21 +63,21 @@ main(int argc,char **argv)
         struct fd_set           rmask; 
         char                    echo=FALSE; 
  
-        signal(SIGTERM,killHandler);                     /* Éè»Øµ÷º¯Êı        */ 
+        signal(SIGTERM,killHandler);                     /* è®¾å›è°ƒå‡½æ•°        */ 
         signal(SIGINT,killHandler); 
         signal(SIGPIPE,closeHandler); 
  
-        hp = gethostbyname("bbs.tsinghua.edu.cn");           /* bbs·şÎñÆ÷µÄÃû×Ö */ 
+        hp = gethostbyname("bbs.tsinghua.edu.cn");           /* bbsæœåŠ¡å™¨çš„åå­— */ 
         if(hp==NULL) { printf("Unkonwn host\n"); exit(-1); } 
         bzero((char *)& host,sizeof(host)); 
         bcopy(hp->h_addr,(char *)& host.sin_addr,hp->h_length); 
         host.sin_family=AF_INET; 
-        host.sin_port=htons(23);                         /*telnet±ê×¼¶Ë¿Ú  */ 
-        if ( (sockfd=socket(AF_INET,SOCK_STREAM,0))<0 )  /* ×èÈûÊ½socket */ 
+        host.sin_port=htons(23);                         /*telnetæ ‡å‡†ç«¯å£  */ 
+        if ( (sockfd=socket(AF_INET,SOCK_STREAM,0))<0 )  /* é˜»å¡å¼socket */ 
         { printf(" Error open socket\n"); 
           exit(-1); 
         } 
-        status=connect(sockfd,(struct sockaddr *)& host,sizeof(host));/*Á¬½Ó*/ 
+        status=connect(sockfd,(struct sockaddr *)& host,sizeof(host));/*è¿æ¥*/ 
         if(status<0) { printf("Connect error\n"); exit(-1); } 
  
   initscr(); 
@@ -85,51 +85,51 @@ main(int argc,char **argv)
   for(;;) 
   { 
         timeout.tv_sec=0; 
-        timeout.tv_usec=10;                    /* ³¬Ê±ÏŞÖÆ */ 
+        timeout.tv_usec=10;                    /* è¶…æ—¶é™åˆ¶ */ 
         FD_ZERO( & rmask); 
         FD_SET(sockfd,& rmask); 
         FD_SET(0,     & rmask); 
         status=select(sockfd+1,& rmask,ZERO,ZERO,& timeout); 
         if(FD_ISSET(sockfd,& rmask) ) 
-        {  n=read(sockfd,& c,1);           /* ¶ÁÈ¡Ò»¸ö×Ö½Ú           */ 
+        {  n=read(sockfd,& c,1);           /* è¯»å–ä¸€ä¸ªå­—èŠ‚           */ 
            if( n<=0 ) { printf("socket read error.\n"); exit(-1); } 
-           if (c == 255)                  // IAC×Ö·û,ºó¸útelnetÃüÁîºÍĞ­ÉÌÑ¡Ïî 
+           if (c == 255)                  // IACå­—ç¬¦,åè·Ÿtelnetå‘½ä»¤å’Œåå•†é€‰é¡¹ 
            { 
-                cmd = receiveChar();         //¶ÁÈëÃüÁî 
-                opt = receiveChar();         //¶ÁÈëÑ¡Ïî 
+                cmd = receiveChar();         //è¯»å…¥å‘½ä»¤ 
+                opt = receiveChar();         //è¯»å…¥é€‰é¡¹ 
                 switch(opt) 
                 { 
-                  case 1:            // echoĞ­ÉÌÑ¡Ïî 
+                  case 1:            // echoåå•†é€‰é¡¹ 
                      switch(cmd) 
-                     {case 253:    //´¦ÀíIAC DO ECHO 
+                     {case 253:    //å¤„ç†IAC DO ECHO 
                          echo=TRUE; 
-                         sendChar(255); //·¢ËÍ IAC WILL ECHO 
+                         sendChar(255); //å‘é€ IAC WILL ECHO 
                          sendChar(251); 
                          sendChar(1); 
                          break; 
-                      case 254:   //´¦ÀíIAC DON'T ECHO 
+                      case 254:   //å¤„ç†IAC DON'T ECHO 
                           echo=FALSE; 
-                          sendChar(255);  // ·¢ËÍ IAC WON'T ECHO 
+                          sendChar(255);  // å‘é€ IAC WON'T ECHO 
                           sendChar(252); 
                           sendChar(1); 
                           break; 
-                      case 251:    //´¦ÀíIAC WILL  ECHO 
-                          sendChar(255);  // ·¢ËÍ IAC DO  ECHO 
+                      case 251:    //å¤„ç†IAC WILL  ECHO 
+                          sendChar(255);  // å‘é€ IAC DO  ECHO 
                           sendChar(253); 
                           sendChar(1); 
                       } 
                       break; 
-                  case 3:          // supress go-ahead(ÒÖÖÆÏòÇ°Ñ¡Ïî) 
+                  case 3:          // supress go-ahead(æŠ‘åˆ¶å‘å‰é€‰é¡¹) 
                      break; 
-                  case 24:        // terminal type(ÖÕ¶ËÀàĞÍÑ¡Ïî) 
+                  case 24:        // terminal type(ç»ˆç«¯ç±»å‹é€‰é¡¹) 
                      if (cmd == 253) 
                      { 
-                                // IAC WILL terminal-type ½«¸æËßserverÖÕ¶ËÀàĞÍ 
+                                // IAC WILL terminal-type å°†å‘Šè¯‰serverç»ˆç«¯ç±»å‹ 
                                 sendChar(255); 
                                 sendChar(251); 
                                 sendChar(24); 
                                  // IAC SB terminal-type IS <term> IAC SE 
-                                sendChar(255); //´«ËÍÖÕ¶ËÀàĞÍ×Ö·û´® 
+                                sendChar(255); //ä¼ é€ç»ˆç«¯ç±»å‹å­—ç¬¦ä¸² 
                                 sendChar(250); 
                                 sendChar(24); 
                                 sendChar(0); 
@@ -138,7 +138,7 @@ main(int argc,char **argv)
                                 sendChar(240); 
                       } 
                       else if (cmd == 250) 
-                      {          //SBºÍSEÒªÅä¶Ô³öÏÖ 
+                      {          //SBå’ŒSEè¦é…å¯¹å‡ºç° 
                           while(receiveChar() != 240) 
                                         ; 
                        } 
@@ -148,13 +148,13 @@ main(int argc,char **argv)
                        if (cmd == 253) 
                        { 
                                 // IAC DONT whatever 
-                                sendChar(255); //ÆäËüµÄĞ­ÉÌÑ¡Ïî¾ù²»Í¬Òâ 
+                                sendChar(255); //å…¶å®ƒçš„åå•†é€‰é¡¹å‡ä¸åŒæ„ 
                                 sendChar(252); 
                                 sendChar(opt); 
                         } 
                  } 
             } 
-            else                                     //´¦Àí×Ö·ûÊı¾İ 
+            else                                     //å¤„ç†å­—ç¬¦æ•°æ® 
             { putchar(c); 
               if(echo==TRUE) sendChar( c); 
             } 
@@ -169,29 +169,29 @@ main(int argc,char **argv)
  
  
  
-¡¾ ÔÚ ladykiller (sweet) µÄ´ó×÷ÖĞÌáµ½: ¡¿ 
+ã€ åœ¨ ladykiller (sweet) çš„å¤§ä½œä¸­æåˆ°: ã€‘ 
 :   
-:  ÇëÎÊ¸÷Î»´óÏÀ£¬ 
-:  ÄÄÀïÓĞTELNET¿Í»§¶ËµÄÔ´´úÂë£¬ 
-:  Âé·³¸æËßÒ»ÏÂ¡££¡£¡£¡ 
-:  Ğ»Ğ»£¡£¡ 
+:  è¯·é—®å„ä½å¤§ä¾ ï¼Œ 
+:  å“ªé‡Œæœ‰TELNETå®¢æˆ·ç«¯çš„æºä»£ç ï¼Œ 
+:  éº»çƒ¦å‘Šè¯‰ä¸€ä¸‹ã€‚ï¼ï¼ï¼ 
+:  è°¢è°¢ï¼ï¼ 
 :   
  
  
 -- 
-ÄêÇá 
-ĞèÒªµÄÊÇÒ»Æ¬¿ªÀ«µÄÌì¿Õ 
-ºÍ³¤ÁË³á°òµÄĞÄ 
-ËäÈ»ÔÚÓêÀï×ßÕß 
-È´ÓĞÒ»Æ¬Çç¿Õ 
-Ò»Æ¬Çç¿Õ 
+å¹´è½» 
+éœ€è¦çš„æ˜¯ä¸€ç‰‡å¼€é˜”çš„å¤©ç©º 
+å’Œé•¿äº†ç¿…è†€çš„å¿ƒ 
+è™½ç„¶åœ¨é›¨é‡Œèµ°è€… 
+å´æœ‰ä¸€ç‰‡æ™´ç©º 
+ä¸€ç‰‡æ™´ç©º 
  
-¡ù À´Ô´:¡¤BBS Ë®Ä¾Çå»ªÕ¾ bbs.net.tsinghua.edu.cn¡¤[FROM: sun.aiar.xjtu.e] 
+â€» æ¥æº:Â·BBS æ°´æœ¨æ¸…åç«™ bbs.net.tsinghua.edu.cnÂ·[FROM: sun.aiar.xjtu.e] 
 
 --------------------------------------------------------------------------------
 
 
-[ÉÏÒ»Æª] [±¾ÌÖÂÛÇø] [»ØĞÅµ½±¾°æ] [ĞŞ¸Ä] [É¾³ı] [»ØĞÅ¸ø×÷Õß] [ÏÂÒ»Æª] [Í¬×÷ÕßÔÄ¶Á] [Í¬Ö÷ÌâÔÄ¶Á]
+[ä¸Šä¸€ç¯‡] [æœ¬è®¨è®ºåŒº] [å›ä¿¡åˆ°æœ¬ç‰ˆ] [ä¿®æ”¹] [åˆ é™¤] [å›ä¿¡ç»™ä½œè€…] [ä¸‹ä¸€ç¯‡] [åŒä½œè€…é˜…è¯»] [åŒä¸»é¢˜é˜…è¯»]
 
 
-[·µ»ØÊ×Ò³] [·ÖÀàÌÖÂÛÇø] [È«²¿ÌÖÂÛÇø]¡¡  ÌÖÂÛÇø
+[è¿”å›é¦–é¡µ] [åˆ†ç±»è®¨è®ºåŒº] [å…¨éƒ¨è®¨è®ºåŒº]ã€€  è®¨è®ºåŒº
